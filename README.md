@@ -12,18 +12,20 @@ Make sure you have the following installed on your system:
 
 Follow these steps to get the project running locally:
 
-### Clone the repository
+### 1.Clone the repository
 
 ```bash
 git clone https://github.com/YourUsername/YourRepository.git
 
 cd YourRepository
-
+```
+### 2.Install dependencies
+```bash
 npm install
 # or
 yarn install
 ```
-### Run the project
+### 3.Start Dev Server
 
 ```bash
 npm run dev
