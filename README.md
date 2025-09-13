@@ -1,17 +1,34 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Prerequisites
+
+Make sure you have the following installed on your system:
+
+- [Git](https://git-scm.com/)
+- [Node.js](https://nodejs.org/) (if it's a Node project)
+- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)  
+
 ## Getting Started
 
-First, run the development server:
+Follow these steps to get the project running locally:
+
+### Clone the repository
+
+```bash
+git clone https://github.com/YourUsername/YourRepository.git
+
+cd YourRepository
+
+npm install
+# or
+yarn install
+```
+### Run the project
 
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
