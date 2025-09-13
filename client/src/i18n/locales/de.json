@@ -1,0 +1,22 @@
+{
+  "common": {
+    "loading": "Laden...",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "submit": "Senden"
+  },
+  "navigation": {
+    "home": "Startseite",
+    "dashboard": "Dashboard",
+    "profile": "Profil",
+    "logout": "Abmelden",
+    "login": "Anmelden"
+  },
+  "auth": {
+    "login_title": "Bei JurisGuide anmelden",
+    "email": "E-Mail-Adresse",
+    "password": "Passwort"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "common": {
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "success": "نجح",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "submit": "إرسال"
+  },
+  "navigation": {
+    "home": "الرئيسية",
+    "dashboard": "لوحة التحكم",
+    "profile": "الملف الشخصي",
+    "logout": "تسجيل الخروج",
+    "login": "تسجيل الدخول"
+  },
+  "auth": {
+    "login_title": "تسجيل الدخول إلى JurisGuide",
+    "email": "عنوان البريد الإلكتروني",
+    "password": "كلمة المرور"
+  }
+}

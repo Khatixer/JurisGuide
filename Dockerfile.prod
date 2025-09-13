@@ -1,0 +1,79 @@
+# Multi-stage production Dockerfile for JurisGuide platform
+
+# Build stage for client
+FROM node:18-alpine AS client-builder
+WORKDIR /app/client
+
+# Copy client package files
+COPY client/package*.json ./
+RUN npm ci --only=production
+
+# Copy client source and build
+COPY client/ ./
+RUN npm run build
+
+# Build stage for server
+FROM node:18-alpine AS server-builder
+WORKDIR /app/server
+
+# Copy server package files
+COPY server/package*.json ./
+RUN npm ci --only=production
+
+# Copy server source and compile TypeScript
+COPY server/ ./
+RUN npm run build
+
+# Production stage
+FROM node:18-alpine AS production
+
+# Install security updates and required packages
+RUN apk update && apk upgrade && \
+    apk add --no-cache \
+    curl \
+    dumb-init \
+    && rm -rf /var/cache/apk/*
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S jurisguide -u 1001
+
+# Set working directory
+WORKDIR /app
+
+# Copy built server files
+COPY --from=server-builder --chown=jurisguide:nodejs /app/server/dist ./server/dist
+COPY --from=server-builder --chown=jurisguide:nodejs /app/server/node_modules ./server/node_modules
+COPY --from=server-builder --chown=jurisguide:nodejs /app/server/package*.json ./server/
+
+# Copy built client files
+COPY --from=client-builder --chown=jurisguide:nodejs /app/client/build ./client/build
+
+# Copy database migrations and configuration
+COPY --chown=jurisguide:nodejs server/database ./server/database
+COPY --chown=jurisguide:nodejs server/config ./server/config
+
+# Create necessary directories
+RUN mkdir -p /app/logs /app/uploads && \
+    chown -R jurisguide:nodejs /app/logs /app/uploads
+
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV LOG_LEVEL=info
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:3000/health || exit 1
+
+# Switch to non-root user
+USER jurisguide
+
+# Expose port
+EXPOSE 3000
+
+# Use dumb-init to handle signals properly
+ENTRYPOINT ["dumb-init", "--"]
+
+# Start the application
+CMD ["node", "server/dist/index.js"]

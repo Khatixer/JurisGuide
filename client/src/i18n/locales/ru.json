@@ -1,0 +1,22 @@
+{
+  "common": {
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "success": "Успех",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "submit": "Отправить"
+  },
+  "navigation": {
+    "home": "Главная",
+    "dashboard": "Панель",
+    "profile": "Профиль",
+    "logout": "Выйти",
+    "login": "Войти"
+  },
+  "auth": {
+    "login_title": "Войти в JurisGuide",
+    "email": "Адрес электронной почты",
+    "password": "Пароль"
+  }
+}

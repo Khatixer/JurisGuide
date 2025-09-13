@@ -1,0 +1,22 @@
+{
+  "common": {
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功",
+    "cancel": "取消",
+    "save": "保存",
+    "submit": "提交"
+  },
+  "navigation": {
+    "home": "首页",
+    "dashboard": "仪表板",
+    "profile": "个人资料",
+    "logout": "登出",
+    "login": "登录"
+  },
+  "auth": {
+    "login_title": "登录 JurisGuide",
+    "email": "电子邮件地址",
+    "password": "密码"
+  }
+}

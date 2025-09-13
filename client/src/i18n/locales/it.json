@@ -1,0 +1,22 @@
+{
+  "common": {
+    "loading": "Caricamento...",
+    "error": "Errore",
+    "success": "Successo",
+    "cancel": "Annulla",
+    "save": "Salva",
+    "submit": "Invia"
+  },
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "profile": "Profilo",
+    "logout": "Esci",
+    "login": "Accedi"
+  },
+  "auth": {
+    "login_title": "Accedi a JurisGuide",
+    "email": "Indirizzo email",
+    "password": "Password"
+  }
+}

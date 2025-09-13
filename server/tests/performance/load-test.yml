@@ -1,0 +1,179 @@
+config:
+  target: 'http://localhost:5000'
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      name: "Warm up"
+    - duration: 120
+      arrivalRate: 10
+      name: "Ramp up load"
+    - duration: 300
+      arrivalRate: 20
+      name: "Sustained load"
+    - duration: 60
+      arrivalRate: 50
+      name: "Peak load"
+  processor: "./test-functions.js"
+  variables:
+    testUsers:
+      - "test1@example.com"
+      - "test2@example.com"
+      - "test3@example.com"
+    legalCategories:
+      - "contract-law"
+      - "family-law"
+      - "employment-law"
+      - "housing-law"
+    jurisdictions:
+      - "US-CA"
+      - "US-NY"
+      - "US-TX"
+      - "UK-ENG"
+
+scenarios:
+  - name: "Legal Guidance Workflow"
+    weight: 40
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "{{ $randomString() }}@example.com"
+            password: "password123"
+          capture:
+            - json: "$.token"
+              as: "authToken"
+            - json: "$.user.id"
+              as: "userId"
+      
+      - post:
+          url: "/api/legal-queries"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            description: "{{ generateLegalQuery() }}"
+            category: "{{ $pick(legalCategories) }}"
+            jurisdiction: ["{{ $pick(jurisdictions) }}"]
+            urgency: "{{ $pick(['low', 'medium', 'high']) }}"
+            culturalContext: "Western business practices"
+            language: "en"
+          capture:
+            - json: "$.query.id"
+              as: "queryId"
+      
+      - post:
+          url: "/api/legal-guidance/generate"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            queryId: "{{ queryId }}"
+      
+      - get:
+          url: "/api/legal-queries"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+
+  - name: "Lawyer Matching Workflow"
+    weight: 30
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "{{ $randomString() }}@example.com"
+            password: "password123"
+          capture:
+            - json: "$.token"
+              as: "authToken"
+      
+      - post:
+          url: "/api/lawyers/search"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            budget:
+              min: 200
+              max: 500
+            location:
+              country: "US"
+              state: "CA"
+            caseType: "{{ $pick(legalCategories) }}"
+            urgency: "medium"
+            languagePreference: "en"
+      
+      - get:
+          url: "/api/lawyers/{{ generateLawyerId() }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+
+  - name: "Mediation Workflow"
+    weight: 20
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "{{ $randomString() }}@example.com"
+            password: "password123"
+          capture:
+            - json: "$.token"
+              as: "authToken"
+            - json: "$.user.id"
+              as: "userId"
+      
+      - post:
+          url: "/api/mediation/cases"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            parties:
+              - userId: "{{ userId }}"
+                role: "complainant"
+              - userId: "{{ generateUserId() }}"
+                role: "respondent"
+            dispute:
+              summary: "{{ generateDisputeSummary() }}"
+              category: "{{ $pick(legalCategories) }}"
+              jurisdiction: ["{{ $pick(jurisdictions) }}"]
+              culturalFactors: ["business-practices"]
+          capture:
+            - json: "$.case.id"
+              as: "caseId"
+      
+      - get:
+          url: "/api/mediation/cases"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+
+  - name: "AI Service Load Test"
+    weight: 10
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "{{ $randomString() }}@example.com"
+            password: "password123"
+          capture:
+            - json: "$.token"
+              as: "authToken"
+      
+      - post:
+          url: "/api/legal-queries"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            description: "{{ generateComplexLegalQuery() }}"
+            category: "{{ $pick(legalCategories) }}"
+            jurisdiction: ["{{ $pick(jurisdictions) }}", "{{ $pick(jurisdictions) }}"]
+            urgency: "high"
+            culturalContext: "Cross-cultural business dispute"
+            language: "en"
+          capture:
+            - json: "$.query.id"
+              as: "queryId"
+      
+      - post:
+          url: "/api/legal-guidance/generate"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            queryId: "{{ queryId }}"
+          expect:
+            - statusCode: [200, 202]

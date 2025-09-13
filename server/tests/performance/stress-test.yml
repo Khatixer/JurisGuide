@@ -1,0 +1,122 @@
+config:
+  target: 'http://localhost:5000'
+  phases:
+    - duration: 300
+      arrivalRate: 1
+      name: "Baseline"
+    - duration: 300
+      arrivalRate: 10
+      name: "Normal Load"
+    - duration: 300
+      arrivalRate: 50
+      name: "High Load"
+    - duration: 300
+      arrivalRate: 100
+      name: "Stress Load"
+    - duration: 300
+      arrivalRate: 200
+      name: "Breaking Point"
+  processor: "./test-functions.js"
+
+scenarios:
+  - name: "AI Service Stress Test"
+    weight: 60
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "stress-test-{{ $randomString() }}@example.com"
+            password: "password123"
+          capture:
+            - json: "$.token"
+              as: "authToken"
+      
+      - loop:
+          - post:
+              url: "/api/legal-queries"
+              headers:
+                Authorization: "Bearer {{ authToken }}"
+              json:
+                description: "{{ generateComplexLegalQuery() }}"
+                category: "contract-law"
+                jurisdiction: ["US-CA", "US-NY"]
+                urgency: "high"
+                culturalContext: "Cross-cultural business dispute"
+                language: "en"
+              capture:
+                - json: "$.query.id"
+                  as: "queryId"
+          
+          - post:
+              url: "/api/legal-guidance/generate"
+              headers:
+                Authorization: "Bearer {{ authToken }}"
+              json:
+                queryId: "{{ queryId }}"
+              expect:
+                - statusCode: [200, 202, 429, 503]
+        count: 3
+
+  - name: "Database Stress Test"
+    weight: 30
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "db-stress-{{ $randomString() }}@example.com"
+            password: "password123"
+          capture:
+            - json: "$.token"
+              as: "authToken"
+      
+      - loop:
+          - get:
+              url: "/api/legal-queries"
+              headers:
+                Authorization: "Bearer {{ authToken }}"
+          
+          - post:
+              url: "/api/lawyers/search"
+              headers:
+                Authorization: "Bearer {{ authToken }}"
+              json:
+                budget: { min: 100, max: 1000 }
+                location: { country: "US", state: "CA" }
+                caseType: "contract-law"
+                urgency: "medium"
+          
+          - get:
+              url: "/api/mediation/cases"
+              headers:
+                Authorization: "Bearer {{ authToken }}"
+        count: 5
+
+  - name: "Concurrent User Simulation"
+    weight: 10
+    flow:
+      - post:
+          url: "/api/auth/register"
+          json:
+            email: "concurrent-{{ $randomString() }}@example.com"
+            password: "password123"
+            profile:
+              firstName: "Stress"
+              lastName: "Test"
+              location: { country: "US", state: "CA", city: "Test City" }
+              culturalBackground: "Western"
+              preferredLanguage: "en"
+              timezone: "America/Los_Angeles"
+          capture:
+            - json: "$.token"
+              as: "authToken"
+      
+      - post:
+          url: "/api/legal-queries"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            description: "Concurrent user stress test query"
+            category: "contract-law"
+            jurisdiction: ["US-CA"]
+            urgency: "medium"
+            language: "en"
